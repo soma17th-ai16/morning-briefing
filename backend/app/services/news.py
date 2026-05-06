@@ -10,6 +10,7 @@ NewsAPI(또는 네이버 뉴스 검색 API) 호출 + 중복 제거 + LLM 한 줄
 """
 from datetime import UTC, datetime
 
+from app.core.config import get_settings
 from app.core.errors import NewsError, LLMError
 from app.core.llm import get_llm
 from app.schemas.news import NewsItem, NewsResult
@@ -19,7 +20,6 @@ import re
 from email.utils import parsedate_to_datetime
 from typing import Any
 import httpx
-import os
 import asyncio
 
 NAVER_NEWS_ENDPOINT = "https://openapi.naver.com/v1/search/news.json"
@@ -214,8 +214,9 @@ async def fetch_news(categories: list[str], limit: int = 5) -> list[NewsResult]:
     if not categories:
         raise NewsError("categories가 비어 있음")
 
-    client_id = os.getenv("NAVER_CLIENT_ID")
-    client_secret = os.getenv("NAVER_CLIENT_SECRET")
+    settings = get_settings()
+    client_id = settings.naver_client_id
+    client_secret = settings.naver_client_secret
     if not client_id or not client_secret:
         raise NewsError("NAVER_CLIENT_ID / NAVER_CLIENT_SECRET 미설정")
 
