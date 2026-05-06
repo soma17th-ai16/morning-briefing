@@ -26,12 +26,21 @@ uv sync
 uv run uvicorn app.main:app --reload --port 8001
 # 브라우저에서 http://localhost:8001/docs (Swagger) 접속
 
-# 3. 테스트 실행
+# 3. 프론트엔드 로컬 실행 (다른 터미널)
+cd frontend
+uv sync
+uv run streamlit run streamlit_app.py
+# 브라우저에서 http://localhost:8002 접속
+
+# 4. 백엔드 테스트
+cd backend
 uv run pytest
 
-# 4. 전체 컨테이너 실행 (FE 합류 후)
+# 5. 전체 컨테이너 실행 (백엔드 8001 + 프론트엔드 8002 동시)
 docker compose up --build
 ```
+
+프론트엔드 단독 가이드는 [frontend/README.md](frontend/README.md) 참고.
 
 ## API
 
@@ -244,6 +253,18 @@ morning-briefing/
 │   ├── Dockerfile
 │   └── .env.example
 ├── frontend/                        # 김민솔 영역 (Streamlit)
+│   ├── streamlit_app.py             # 진입점
+│   ├── app/
+│   │   ├── api_client.py            # 백엔드 호출 + 도메인 예외
+│   │   ├── config.py                # BACKEND_URL, 타임아웃
+│   │   ├── constants.py             # 도시/카테고리 옵션
+│   │   ├── mock_data.py             # 5가지 시나리오 mock (개발 모드)
+│   │   ├── schemas.py               # 백엔드 contract 미러링
+│   │   └── components/
+│   │       └── briefing_view.py     # 카드 UI 렌더
+│   ├── .streamlit/config.toml
+│   ├── Dockerfile
+│   └── pyproject.toml
 ├── docker-compose.yml
 └── README.md
 ```

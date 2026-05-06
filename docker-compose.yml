@@ -17,15 +17,14 @@ services:
       timeout: 3s
       retries: 5
 
-  # 김민솔(FE) 영역. frontend/Dockerfile + Streamlit 앱 추가되면 주석 해제.
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #   container_name: morning-briefing-frontend
-  #   ports:
-  #     - "8002:8002"
-  #   environment:
-  #     - BACKEND_URL=http://backend:8001
-  #   depends_on:
-  #     backend:
-  #       condition: service_healthy
+  frontend:
+    build:
+      context: ./frontend
+    container_name: morning-briefing-frontend
+    ports:
+      - "8002:8002"
+    environment:
+      - BACKEND_URL=http://backend:8001
+    depends_on:
+      backend:
+        condition: service_healthy
