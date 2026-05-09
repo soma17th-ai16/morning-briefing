@@ -21,6 +21,7 @@ from email.utils import parsedate_to_datetime
 from typing import Any
 import httpx
 import asyncio
+from collections import defaultdict
 
 NAVER_NEWS_ENDPOINT = "https://openapi.naver.com/v1/search/news.json"
 HTTP_TIMEOUT = 5.0
@@ -96,19 +97,34 @@ def _is_korean_article(title: str, description: str = "", min_ratio: float = 0.2
 
 def _dedupe_raw_items(raw_items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """제목 유사도 기준으로 중복 제거. 입력 순서 유지."""
+    token_to_indices: dict[str, list[int]] = defaultdict(list)
     seen_token_sets: list[set[str]] = []
     result: list[dict[str, Any]] = []
 
+    # inverted index 방식으로 naive 보다 성능 개선
     for item in raw_items:
         title = _clean_html(item.get("title", ""))
         tokens = _title_tokens(title)
 
         if not tokens:
             continue
-        if any(_is_similar(tokens, seen) for seen in seen_token_sets):
+
+        # 후보군 = 공통 토큰을 하나라도 가진 기존 아이템들
+        candidate_indices = set()
+        for tok in tokens:
+            candidate_indices.update(token_to_indices[tok])
+
+        is_dup = any(
+            _is_similar(tokens, seen_token_sets[idx])
+            for idx in candidate_indices
+        )
+        if is_dup:
             continue
 
+        new_idx = len(seen_token_sets)
         seen_token_sets.append(tokens)
+        for tok in tokens:
+            token_to_indices[tok].append(new_idx)
         result.append(item)
 
     return result
