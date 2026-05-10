@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"from app.components.briefing_view import render_briefing; print\\('import OK'\\)\")",
+      "Bash(python -c \"from app.mock_data import make_mock_briefing; from app.schemas import BriefingRequest; req = BriefingRequest\\(location='서울', categories=['IT','경제'], length='medium'\\); b = make_mock_briefing\\(req\\); print\\('weather icon test:', b.weather.precipitation_probability\\); print\\('news categories:', [n.category for n in b.news]\\); print\\('degraded:', b.degraded\\)\")",
+      "Bash(uv run *)"
+    ]
+  }
+}

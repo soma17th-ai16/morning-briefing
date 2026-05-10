@@ -76,10 +76,10 @@ def _run_briefing(
             st.session_state.error = str(exc)
 
 
-st.set_page_config(page_title="모닝 브리핑", layout="wide")
+st.set_page_config(page_title="☀️ 모닝 브리핑", page_icon="☀️", layout="wide")
 
-st.title("모닝 브리핑")
-st.caption("아침에 한 번, 오늘의 날씨와 뉴스를 한 화면에.")
+st.markdown("# ☀️ 모닝 브리핑")
+st.caption("일어나서 한 번, 오늘 입을 옷 · 우산 여부 · 꼭 알아야 할 뉴스를 한 화면에.")
 
 local_storage = LocalStorage()
 saved = _load_saved_settings(local_storage)
