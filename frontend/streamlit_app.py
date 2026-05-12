@@ -1,4 +1,5 @@
 import json
+import os
 
 import streamlit as st
 from pydantic import ValidationError
@@ -85,27 +86,30 @@ local_storage = LocalStorage()
 saved = _load_saved_settings(local_storage)
 default_location, default_categories = _resolve_defaults(saved)
 
-with st.sidebar:
-    st.subheader("개발 모드")
-    use_mock = st.toggle(
-        "Mock 응답 사용",
-        value=True,
-        help="백엔드/에이전트 미완성 동안 가짜 응답으로 화면 개발",
-    )
-    mock_scenario_label = "정상"
-    if use_mock:
-        mock_scenario_label = st.selectbox(
-            "Mock 시나리오",
-            list(MOCK_SCENARIOS.keys()),
-            index=0,
-        )
-    else:
-        if check_health():
-            st.success("연결됨")
-        else:
-            st.error("연결 실패")
+_DEV_MODE = os.environ.get("DEV_MODE", "").lower() in ("1", "true")
 
-    st.divider()
+with st.sidebar:
+    use_mock = False
+    mock_scenario_label = "정상"
+    if _DEV_MODE:
+        st.subheader("개발 모드")
+        use_mock = st.toggle(
+            "Mock 응답 사용",
+            value=False,
+            help="백엔드/에이전트 미완성 동안 가짜 응답으로 화면 개발",
+        )
+        if use_mock:
+            mock_scenario_label = st.selectbox(
+                "Mock 시나리오",
+                list(MOCK_SCENARIOS.keys()),
+                index=0,
+            )
+        else:
+            if check_health():
+                st.success("연결됨")
+            else:
+                st.error("연결 실패")
+        st.divider()
 
     st.subheader("설정")
     if saved:
